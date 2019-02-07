@@ -1,7 +1,7 @@
 /**
  * mediaserver module for node.js
  *
- * MIT license, Oguz Bastemur 2014-2018
+ * MIT license, Oguz Bastemur 2014-2018, edited by Timo Geier 2019
  */
 
 var fs = require('fs'),
@@ -36,6 +36,7 @@ exports.noCache = false;
 exports.mediaTypes = exts;
 
 var getRange = function (req, total) {
+  let chunksize = 131072;
   var range = [0, total, 0];
   var rinfo = req.headers ? req.headers.range : null;
 
@@ -45,10 +46,12 @@ var getRange = function (req, total) {
       var ranges = rinfo.substr(rloc + 6).split('-');
       try {
         range[0] = parseInt(ranges[0]);
-        if (ranges[1] && ranges[1].length) {
-          range[1] = parseInt(ranges[1]);
+
+        // if (ranges[1] && ranges[1].length) {
+        // if (ranges[1]) {
+          range[1] = parseInt(range[0] + chunksize < total ? range[0] + chunksize : total);
           range[1] = range[1] < 16 ? 16 : range[1];
-        }
+        // }
       } catch (e) {}
     }
 
@@ -109,7 +112,7 @@ exports.pipe = function (req, res, path, type, opt_cb) {
 
     if (!ext.length || !pipe_extensions[ext]) {
       var header = {
-        'Content-Length': range[1],
+        'Content-Length': range[1] - range[0],
         'Content-Type': type,
         'Access-Control-Allow-Origin': req.headers.origin || "*",
         'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
@@ -119,7 +122,7 @@ exports.pipe = function (req, res, path, type, opt_cb) {
       if (range[2]) {
         header['Accept-Ranges'] = 'bytes';
         header['Content-Range'] = 'bytes ' + range[0] + '-' + range[1] + '/' + total;
-        header['Content-Length'] = range[2];
+        header['Content-Length'] = range[1] - range[0];
 
         res.writeHead(206, header);
       } else {

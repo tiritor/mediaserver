@@ -1,7 +1,7 @@
 /**
  * mediaserver module for JXcore and Node.JS
  *
- * MIT license, Oguz Bastemur 2014
+ * MIT license, Oguz Bastemur 2014, edited by Timo Geier 2019
  *
  *
  * media extensions
@@ -105,6 +105,7 @@ exports = module.exports = {
   ".nif": "image/x-niff",
   ".niff": "image/x-niff",
   ".ogg": "audio/ogg",
+  ".opus": "audio/opus",
   ".pbm": "image/x-portable-bitmap",
   ".pct": "image/x-pict",
   ".pcx": "image/x-pcx",
